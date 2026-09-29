@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Farmer Bot - MadhuChain</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;600;700;900&amp;family=Poppins:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif;
+            background: #0f1419;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .telegram-bg {
+            background: linear-gradient(180deg, #0088cc 0%, #006699 100%);
+        }
+        
+        .chat-container {
+            max-width: 600px;
+            height: 100vh;
+            background: #0f1419;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message-bubble {
+            animation: slideIn 0.3s ease-out;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .typing-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #8b949e;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+        
+        .bot-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #0088cc, #006699);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff9500, #ff6b00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .quick-btn {
+            transition: all 0.2s;
+        }
+        
+        .quick-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .hive-card {
+            transition: all 0.3s;
+        }
+
+        .hive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 136, 204, 0.2);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #0088cc;
+            box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
+        }
+
+        .emoji {
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900">
+<div class="chat-container mx-auto">
+<!-- Header -->
+<header class="telegram-bg text-white py-4 shadow-lg sticky top-0 z-50">
+<div class="container mx-auto px-4 flex justify-between items-center">
+<div class="flex items-center space-x-3">
+<a class="text-2xl hover:opacity-80" href="index.html">•</a>
+<div class="bot-avatar emoji">•</div>
+<div>
+<h1 class="text-xl font-bold">MadhuChain Farmer Bot</h1>
+<p class="text-xs opacity-90">MadhuChain Farmer Bot</p>
+</div>
+</div>
+<button class="text-2xl hover:opacity-80 emoji" onclick="showScreen('settings')">•</button>
+</div>
+</header>
+<!-- SCREEN 1: Language Selection -->
+<div class="screen active flex-1 flex-col justify-center items-center p-6 bg-gray-900" id="languageScreen">
+<div class="bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full">
+<div class="text-center mb-8">
+<div class="text-6xl mb-4 emoji">•</div>
+<h2 class="text-3xl font-bold mb-2 text-white">Welcome to your smart farming assistant</h2>
+<p class="text-gray-400">Select Language / Choose Language</p>
+</div>
+<div class="space-y-4">
+<button class="w-full bg-orange-500 text-white py-4 rounded-xl hover:bg-orange-600 font-semibold text-lg transition transform hover:scale-105" onclick="selectLanguage('hindi')">
+<span class="text-2xl mr-2 emoji">Language</span> Settings
+                    </button>
+<button class="w-full bg-orange-500 text-white py-4 rounded-xl hover:bg-orange-600 font-semibold text-lg transition transform hover:scale-105" onclick="selectLanguage('english')">
+<span class="text-2xl mr-2 emoji">Language</span> English
+                    </button>
+<button class="w-full bg-orange-500 text-white py-4 rounded-xl hover:bg-orange-600 font-semibold text-lg transition transform hover:scale-105" onclick="selectLanguage('hinglish')">
+<span class="text-2xl mr-2 emoji">•</span> Hinglish
+                    </button>
+</div>
+</div>
+</div>
+<!-- SCREEN 2: Chat Interface -->
+<div class="screen flex-1 flex-col bg-gray-900" id="chatScreen">
+<!-- Messages Container -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4" id="chatMessages">
+<!-- Messages will be added here -->
+</div>
+<!-- Typing Indicator -->
+<div class="px-4 py-2 hidden" id="typingIndicator">
+<div class="flex items-center space-x-2">
+<div class="bot-avatar emoji">•</div>
+<div class="bg-gray-800 rounded-2xl px-4 py-2 inline-block">
+<span class="typing-indicator"></span>
+<span class="typing-indicator ml-1"></span>
+<span class="typing-indicator ml-1"></span>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="p-4 bg-gray-800 border-t border-gray-700">
+<div class="flex justify-around gap-2 mb-3">
+<button class="quick-btn bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-600 transition flex-1" onclick="quickQuery('hives')">
+<span class="emoji">•</span>Language SettingsSettings</button>
+<button class="quick-btn bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-600 transition flex-1" onclick="quickQuery('credits')">
+<span class="emoji">•</span>Settings</button>
+<button class="quick-btn bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-600 transition flex-1" onclick="quickQuery('weather')">
+<span class="emoji">Name</span> Language
+                    </button>
+<button class="quick-btn bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-600 transition flex-1" onclick="quickQuery('help')">
+<span class="emoji">•</span>Settings</button>
+</div>
+<!-- Input Area -->
+<div class="flex items-center space-x-2">
+<input class="flex-1 bg-gray-700 text-white border-0 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500" id="messageInput" onkeypress="if(event.key === 'Enter') sendMessage()" placeholder="MadhuChain Farmer Bot..." type="text"/>
+<button class="bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition" onclick="sendMessage()">
+                        Settings
+                    </button>
+</div>
+</div>
+</div>
+<!-- SCREEN 3: Hive Details -->
+<div class="screen flex-1 overflow-y-auto bg-gray-900 p-4" id="hiveDetails">
+<div class="max-w-2xl mx-auto">
+<div class="flex items-center justify-between mb-6">
+<button class="text-gray-400 text-2xl hover:text-white" onclick="showScreen('chatScreen')">•</button>
+<h2 class="text-2xl font-bold text-white"><span class="emoji">•</span>Language SettingsSettings</h2>
+<button class="text-orange-500 text-sm font-semibold hover:text-orange-400" onclick="refreshHives()">
+<span class="emoji">•</span>Settings</button>
+</div>
+<div class="grid md:grid-cols-2 gap-4" id="hivesContainer">
+<!-- Hive cards will be loaded here -->
+</div>
+</div>
+</div>
+<!-- SCREEN 4: Bee Credits Detail -->
+<div class="screen flex-1 overflow-y-auto bg-gray-900 p-4" id="creditsDetail">
+<div class="max-w-2xl mx-auto">
+<div class="flex items-center mb-6">
+<button class="text-gray-400 text-2xl hover:text-white mr-4" onclick="showScreen('chatScreen')">•</button>
+<h2 class="text-2xl font-bold text-white"><span class="emoji">•</span>SettingsLanguage</h2>
+</div>
+<div class="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl p-6 mb-6 shadow-xl">
+<div class="text-center">
+<div class="text-5xl mb-2 emoji">•</div>
+<div class="text-xl mb-2">Name Settings</div>
+<div class="text-6xl font-bold" id="totalCredits">95</div>
+</div>
+</div>
+<div class="space-y-4 mb-6">
+<h3 class="font-bold text-lg text-white">Settings Language Settings</h3>
+<div class="flex justify-between items-center p-4 bg-green-900 bg-opacity-30 rounded-xl">
+<div>
+<div class="font-semibold text-white"><span class="emoji">•</span>Settings Settings</div>
+<div class="text-sm text-gray-400">Settings Settings</div>
+</div>
+<div class="text-2xl font-bold text-green-400">+5</div>
+</div>
+<div class="flex justify-between items-center p-4 bg-green-900 bg-opacity-30 rounded-xl">
+<div>
+<div class="font-semibold text-white"><span class="emoji">•</span>SettingsName Settings</div>
+<div class="text-sm text-gray-400">5-Settings Settings</div>
+</div>
+<div class="text-2xl font-bold text-green-400">+10</div>
+</div>
+<div class="flex justify-between items-center p-4 bg-green-900 bg-opacity-30 rounded-xl">
+<div>
+<div class="font-semibold text-white"><span class="emoji">•</span> SettingsLanguage Settings</div>
+<div class="text-sm text-gray-400">SettingsLanguage Language Language</div>
+</div>
+<div class="text-2xl font-bold text-green-400">+20</div>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="font-bold text-lg text-white">LanguageMadhuChain Farmer Bot</h3>
+<div class="flex justify-between items-center p-4 bg-gray-800 rounded-xl">
+<div>
+<div class="font-semibold text-white"><span class="emoji">•</span>Settings Name</div>
+<div class="text-sm text-gray-400">200 Settings</div>
+</div>
+<button class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-orange-600">
+                            Settings
+                        </button>
+</div>
+<div class="flex justify-between items-center p-4 bg-gray-800 rounded-xl">
+<div>
+<div class="font-semibold text-white"><span class="emoji">•</span>Settings</div>
+<div class="text-sm text-gray-400">500 Settings</div>
+</div>
+<button class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-orange-600">
+                            Settings
+                        </button>
+</div>
+<div class="flex justify-between items-center p-4 bg-gray-800 rounded-xl">
+<div>
+<div class="font-semibold text-white"><span class="emoji">•</span> SettingsLanguage Name</div>
+<div class="text-sm text-gray-400">300 Settings</div>
+</div>
+<button class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-orange-600">
+                            Settings
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- SCREEN 5: Notifications -->
+<div class="screen flex-1 overflow-y-auto bg-gray-900 p-4" id="notifications">
+<div class="max-w-2xl mx-auto">
+<div class="flex items-center mb-6">
+<button class="text-gray-400 text-2xl hover:text-white mr-4" onclick="showScreen('chatScreen')">•</button>
+<h2 class="text-2xl font-bold text-white"><span class="emoji">•</span>Settings</h2>
+</div>
+<div class="space-y-3">
+<div class="bg-gray-800 rounded-xl p-4">
+<div class="flex items-center justify-between mb-2">
+<label class="font-semibold text-white">Language Settings (4 AM)</label>
+<input checked="" class="w-6 h-6 accent-orange-500" type="checkbox"/>
+</div>
+</div>
+<div class="bg-gray-800 rounded-xl p-4">
+<div class="flex items-center justify-between mb-2">
+<label class="font-semibold text-white">Name Settings (4 PM)</label>
+<input checked="" class="w-6 h-6 accent-orange-500" type="checkbox"/>
+</div>
+</div>
+<div class="bg-gray-800 rounded-xl p-4">
+<div class="flex items-center justify-between mb-2">
+<label class="font-semibold text-white">Name Settings (8 PM)</label>
+<input checked="" class="w-6 h-6 accent-orange-500" type="checkbox"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SCREEN 6: Settings -->
+<div class="screen flex-1 overflow-y-auto bg-gray-900 p-4" id="settings">
+<div class="max-w-2xl mx-auto">
+<div class="flex items-center mb-6">
+<button class="text-gray-400 text-2xl hover:text-white mr-4" onclick="showScreen('chatScreen')">•</button>
+<h2 class="text-2xl font-bold text-white"><span class="emoji">•</span> SettingsName</h2>
+</div>
+<div class="space-y-4">
+<div class="bg-gray-800 rounded-xl p-4">
+<h3 class="font-bold mb-3 text-white">Language</h3>
+<select class="w-full bg-gray-700 text-white border-0 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500" onchange="changeLanguage(this.value)">
+<option value="hindi">Settings</option>
+<option value="english">English</option>
+<option value="hinglish">Hinglish</option>
+</select>
+</div>
+<div class="bg-gray-800 rounded-xl p-4">
+<h3 class="font-bold mb-3 text-white">Language</h3>
+<div class="space-y-3">
+<div class="flex justify-between text-sm">
+<span class="text-gray-400">Settings ID</span>
+<span class="font-semibold text-white">F001</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-gray-400">Name</span>
+<span class="font-semibold text-white">Settings Settings</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-gray-400">Settings</span>
+<span class="font-semibold text-white">Settings, Settings Settings</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-red-600 text-white py-3 rounded-xl font-semibold hover:bg-red-700 transition">Settings</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+        let selectedLanguage = 'hindi';
+        let farmerData = {
+            name: 'Settings Settings',
+            farmerId: 'F001',
+            location: 'Settings, Settings Settings?',
+            totalHives: 5,
+            beeCredits: 95,
+            hives: [
+                { id: 1, honey: 80, temp: 32, humidity: 65, health: 'Settings?', status: 'Settings?', alert: null },
+                { id: 2, honey: 95, temp: 31, humidity: 63, health: 'Settings?', status: 'Settings?', alert: null },
+                { id: 3, honey: 60, temp: 31, humidity: 64, health: 'Settings?', status: 'Settings?', alert: null },
+                { id: 4, honey: 45, temp: 33, humidity: 66, health: 'Settings?', status: 'Settings?', alert: null },
+                { id: 5, honey: 50, temp: 38, humidity: 70, health: 'Settings', status: 'Language Settings?', alert: 'Language Settings? ?? Name Name (38•C)' }
+            ]
+        };
+
+        // Screen Management
+        function showScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenName).classList.add('active');
+            
+            if (screenName === 'hiveDetails') loadHives();
+            if (screenName === 'chatScreen') scrollToBottom();
+        }
+
+        // Language Selection
+        function selectLanguage(lang) {
+            selectedLanguage = lang;
+            showScreen('chatScreen');
+            addBotMessage(getWelcomeMessage(lang));
+        }
+
+        function getWelcomeMessage(lang) {
+            const messages = {
+                'hindi': 'NameMadhuChain Farmer Bot?? ??! ??\n\nName Language NameMadhuChain Farmer Bot? Name Language SettingsName Language Name Name Settings??\n\n? ?? Settings Name ?? Name Language Name:\n• Language SettingsSettings? Language Language\n• ?? ?? Language Language Name\n• ?? LanguageMadhuChain Farmer Bot?\n\nName Language Language! ??',
+                'english': 'Hello Rajesh Kumar! ??\n\nI am your digital assistant. I will help you with beekeeping.\n\n? You can ask me anything:\n• How are my hives?\n• What is the weather today?\n• How many Bee credits?\n\nLet us start! ??',
+                'hinglish': 'Hello Rajesh Kumar ji! ??\n\nMain aapki digital assistant hoon. Main aapki beekeeping mein help karungi.\n\n? Aap mujhse kuch bhi pooch sakte hain:\n• Meri hives kaisi hain?\n• Aaj ka mausam kaisa hai?\n• Bee credits kitne hain?\n\nLet us start! ??'
+            };
+            return messages[lang];
+        }
+
+        function changeLanguage(lang) {
+            selectedLanguage = lang;
+            alert('Language Name ??! Language changed to ' + lang);
+        }
+
+        // Chat Functions
+        function addBotMessage(text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start space-x-2';
+            messageDiv.innerHTML = `
+                <div class="bot-avatar emoji">??</div>
+                <div class="message-bubble bg-gray-800 text-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs">
+                    ${text.replace(/\n/g, '<br>')}
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function addUserMessage(text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start space-x-2 justify-end';
+            messageDiv.innerHTML = `
+                <div class="message-bubble bg-orange-500 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-xs">
+                    ${text}
+                </div>
+                <div class="user-avatar emoji">??</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').classList.remove('hidden');
+            scrollToBottom();
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').classList.add('hidden');
+        }
+
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chatMessages');
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addUserMessage(message);
+            input.value = '';
+
+            showTyping();
+            setTimeout(() => {
+                hideTyping();
+                const response = getBotResponse(message);
+                addBotMessage(response);
+            }, 1500);
+        }
+
+        function quickQuery(type) {
+            const queries = {
+                'hives': 'Language SettingsSettings? Language Language',
+                'credits': '?? LanguageMadhuChain Farmer Bot?',
+                'weather': '?? ?? Language Language Name',
+                'help': 'Settings?'
+            };
+
+            if (type === 'hives') {
+                showScreen('hiveDetails');
+                return;
+            }
+
+            if (type === 'credits') {
+                showScreen('creditsDetail');
+                return;
+            }
+
+            addUserMessage(queries[type]);
+            showTyping();
+            setTimeout(() => {
+                hideTyping();
+                addBotMessage(getBotResponse(queries[type]));
+            }, 1500);
+        }
+
+        function getBotResponse(query) {
+            query = query.toLowerCase();
+
+            if (query.includes('Language') || query.includes('hive') || query.includes('SettingsName')) {
+                return '?? Language Name Name 5 SettingsName ?? Settings Language\n\n? 4 Settings Settings? Name\n?? 1 Settings Name Language Settings? (38•C)\n\nSettings?? Settings?? ?? Name "Language SettingsSettings?" Name Settings?';
+            }
+
+            if (query.includes('Settings??') || query.includes('credit')) {
+                return '?? Language Name Name 95 ?? Settings?? Name!\n\nLanguage ??:\n? Settings? Settings??: +5\n? SettingsName Settings?: +10\n?? SettingsLanguage: +20\n\nSettings Language:\n?? Settings?? Name: 200 Settings??\n?? ?? Settings: 500 Settings??';
+            }
+
+            if (query.includes('Language') || query.includes('weather')) {
+                return 'Name ?? ?? Language\n\n?? Settings: Settings, Settings Settings?\nName Settings?: 28.5•C\n?? Name: 65%\nName Name: 12 km/h\n?? Name: Name Settings\n\nSettingsSettings? ?? MadhuChain Farmer Bot?! ??';
+            }
+
+            if (query.includes('help') || query.includes('Settings?')) {
+                return '? Name Language Language Name ?? Language Language\n\n?? ?? Settings Name Language Name:\n• Language Settings? Language Language\n• ?? LanguageMadhuChain Farmer Bot?\n• ?? ?? Settings\n• QR Name Language Settings?\n• SettingsLanguage SettingsLanguage\n\nName ?? ??MadhuChain Farmer Bot? Settings! ??';
+            }
+
+            return '?? Language Name Language ?MadhuChain Farmer Bot ?? Settings ?? "Settings?" Language Settings';
+        }
+
+        // Load Hives
+        function loadHives() {
+            const container = document.getElementById('hivesContainer');
+            container.innerHTML = '';
+
+            farmerData.hives.forEach(hive => {
+                const healthColor = hive.health === 'Settings?' ? 'from-green-500 to-green-600' : 'from-red-500 to-red-600';
+                
+                const hiveCard = document.createElement('div');
+                hiveCard.className = 'hive-card bg-gray-800 rounded-2xl p-5 shadow-xl';
+                hiveCard.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-white">Settings #${hive.id}</h3>
+                        <div class="text-2xl emoji">${hive.health === 'Settings?' ? '?' : '??'}</div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Name Language:</span>
+                            <span class="font-bold text-white">${hive.honey}%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-gradient-to-r ${healthColor} h-2 rounded-full" style="width: ${hive.honey}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400"><span class="emoji">Name</span> Settings?:</span>
+                            <span class="text-white">${hive.temp}•C</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400"><span class="emoji">??</span> Name:</span>
+                            <span class="text-white">${hive.humidity}%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">SettingsLanguage:</span>
+                            <span class="text-white">${hive.health}</span>
+                        </div>
+                    </div>
+
+                    ${hive.alert ? `
+                        <div class="mt-4 bg-red-900 bg-opacity-30 border border-red-500 text-red-400 p-3 rounded-lg text-xs">
+                            <span class="emoji">??</span> ${hive.alert}
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(hiveCard);
+            });
+        }
+
+        function refreshHives() {
+            alert('Settings? ?? Language Settings?? Language Name! ??');
+            loadHives();
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            // Screen starts at language selection
+        };
+    </script>
+</body>
+</html>
