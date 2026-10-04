@@ -1,7 +1,7 @@
 # 🍯 HONEY CHAIN (MadhuChain)
 
 ### Decentralized Honey Traceability Ecosystem
-**Smart India Hackathon 2024 | Problem Statement #26021**
+**Smart India Hackathon 2026 | Problem Statement #SIH26021**
 **Ministry of MSME / KVIC | Software Category**
 
 ---
